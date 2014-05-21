@@ -30,7 +30,7 @@
 		"contao-community-alliance/event-dispatcher":"~1.0"
 	},
 	"autoload":{
-		"psr-0": {
+		"psr-4": {
 			"Bit3\\Contao\\FacebookConnect": "src/"
 		}
 	},
