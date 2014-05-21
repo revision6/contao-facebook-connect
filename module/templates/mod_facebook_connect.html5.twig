@@ -1,0 +1,9 @@
+{% extends 'mod_container.html5.twig' %}
+
+{% block content %}
+	<form class="form" method="post">
+		<input type="hidden" name="TL_FORM" value="facebook_connect_{{ id }}">
+		<input type="hidden" name="REQUEST_TOKEN" value="{{ REQUEST_TOKEN }}">
+		<input type="image" src="assets/facebook-connect/images/facebook.svg" alt="{{ _lang.MSC.facebook_connect }}">
+	</form>
+{% endblock %}

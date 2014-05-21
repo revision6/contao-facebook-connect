@@ -1,0 +1,48 @@
+{
+	"name":"bit3/contao-facebook-connect",
+	"description":"Facebook connect for Contao OpenSource CMS",
+	"keywords":["contao", "facebook", "connect", "log-in"],
+	"type":"contao-module",
+	"homepage":"http://bit3.de",
+	"license":"MIT",
+	"authors":[
+		{
+			"name":"Tristan Lins",
+			"email":"tristan.lins@bit3.de",
+			"homepage":"http://bit3.de",
+			"role":"Developer"
+		}
+	],
+	"support":{
+		"email":"info@bit3.de",
+		"issues":"https://github.com/bit3/contao-facebook-connect/issues",
+		"wiki":"https://github.com/bit3/contao-facebook-connect/wiki",
+		"irc":"irc://irc.freenode.org/contao.dev",
+		"source":"https://github.com/bit3/contao-facebook-connect"
+	},
+	"require":{
+		"php":">=5.3",
+		"contao/core":">=3,<3.4-dev",
+		"contao-community-alliance/composer-plugin": "~2.0",
+		"guzzle/guzzle":"~3.0",
+		"bit3/contao-twig":"~1.0",
+		"bit3/contao-meta-palettes":"~1.0",
+		"contao-community-alliance/event-dispatcher":"~1.0"
+	},
+	"autoload":{
+		"psr-0": {
+			"Bit3\\Contao\\FacebookConnect": "src/"
+		}
+	},
+	"extra":{
+		"contao": {
+			"sources":{
+				"assets":"assets/facebook-connect",
+				"module":"system/modules/facebook-connect"
+			}
+		},
+		"branch-alias": {
+			"dev-develop": "1.0.x-dev"
+		}
+	}
+}
