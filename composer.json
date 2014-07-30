@@ -31,7 +31,7 @@
 	},
 	"autoload":{
 		"psr-4": {
-			"Bit3\\Contao\\FacebookConnect": "src/"
+			"Bit3\\Contao\\FacebookConnect\\": "src/"
 		}
 	},
 	"extra":{
