@@ -17,14 +17,6 @@
  */
 
 /**
- * System settings
- */
-$GLOBALS['TL_CONFIG']['facebook_connect_app_id'] = '';
-$GLOBALS['TL_CONFIG']['facebook_connect_app_secret'] = '';
-$GLOBALS['TL_CONFIG']['facebook_connect_groups'] = '';
-
-
-/**
  * Content elements and frontend modules
  */
 $GLOBALS['FE_MOD']['user']['facebook_connect'] = 'Bit3\Contao\FacebookConnect\FacebookConnect';

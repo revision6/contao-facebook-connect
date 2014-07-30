@@ -25,6 +25,8 @@ use Bit3\Contao\FacebookConnect\Event\PostAuthenticateEvent;
 use Bit3\Contao\FacebookConnect\Event\PostConnectEvent;
 use Bit3\Contao\FacebookConnect\Event\PreAuthenticateEvent;
 use Bit3\Contao\FacebookConnect\Event\PreConnectEvent;
+use Guzzle\Http\Client;
+use Guzzle\Http\Exception\BadResponseException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -127,81 +129,92 @@ class FacebookConnect extends \TwigSimpleHybrid
 		$eventDispatcher->dispatch(FacebookConnectEvents::PRE_CONNECT, $event);
 		$code = $event->getCode();
 
-		// receive a new access token
-		$url = 'https://graph.facebook.com/oauth/access_token?' .
-			http_build_query(
-				array(
-					'client_id'     => $this->facebook_connect_app_id,
-					'redirect_uri'  => $redirectUrl,
-					'client_secret' => $this->facebook_connect_app_secret,
-					'code'          => $code
-				)
-			);
+		try {
+			// receive a new access token
+			$url = 'https://graph.facebook.com/oauth/access_token?' .
+				http_build_query(
+					array(
+						'client_id'     => $this->facebook_connect_app_id,
+						'redirect_uri'  => $redirectUrl,
+						'client_secret' => $this->facebook_connect_app_secret,
+						'code'          => $code
+					)
+				);
 
-		$client = new Client();
+			$client = new Client();
 
-		$request  = $client->get($url);
-		$response = $request->send();
+			$request  = $client->get($url);
+			$response = $request->send();
 
-		parse_str($response->getBody(true), $params);
+			parse_str($response->getBody(true), $params);
 
-		// fetch user profile
-		$url = 'https://graph.facebook.com/me?' . http_build_query(array('access_token' => $params['access_token']));
+			// fetch user profile
+			$url = 'https://graph.facebook.com/me?' . http_build_query(array('access_token' => $params['access_token']));
 
-		$request  = $client->get($url);
-		$response = $request->send();
+			$request  = $client->get($url);
+			$response = $request->send();
 
-		$userData = json_decode($response->getBody(true), true);
+			$userData = json_decode($response->getBody(true), true);
 
-		// faulty connect
-		if (empty($userData['id'])) {
-			$event = new FaultyConnectEvent($params, $userData);
-			$eventDispatcher->dispatch(FacebookConnectEvents::FAULTY_CONNECT, $event);
+			// faulty connect
+			if (empty($userData['id'])) {
+				$event = new FaultyConnectEvent($params, $userData);
+				$eventDispatcher->dispatch(FacebookConnectEvents::FAULTY_CONNECT, $event);
 
-			\Controller::redirect(\Environment::get('base'));
-		}
-
-		$member    = \MemberModel::findOneBy('facebook_id', $userData['id']);
-		$newMember = false;
-
-		if (!$member) {
-			$newMember = true;
-
-			// generate username
-			$username = substr($userData['username'], 0, 12);
-			for ($n = 1; \MemberModel::findBy('username', $username); $n++) {
-				$username = substr($userData['username'], 0, 12 - strlen($n)) . $n;
+				\Controller::redirect(\Environment::get('base'));
 			}
 
-			$member              = new \MemberModel();
-			$member->tstamp      = time();
-			$member->groups      = deserialize($this->facebook_connect_groups, true);
-			$member->dateAdded   = time();
-			$member->createdOn   = time();
-			$member->firstname   = $userData['first_name'];
-			$member->lastname    = $userData['last_name'];
-			$member->gender      = $userData['gender'];
-			$member->email       = strtolower($userData['email']);
-			$member->login       = 1;
-			$member->username    = $username;
-			$member->language    = $userData['locale'];
-			$member->facebook_id = $userData['id'];
+			$member    = \MemberModel::findOneBy('facebook_id', $userData['id']);
+			$newMember = false;
+
+			if (!$member) {
+				$newMember = true;
+
+				// generate username
+				$username = standardize($userData['name']);
+				for ($n = 1; \MemberModel::findBy('username', $username); $n++) {
+					$username = standardize($userData['name'] . '-' . $n);
+				}
+
+				$member              = new \MemberModel();
+				$member->tstamp      = time();
+				$member->groups      = deserialize($this->facebook_connect_groups, true);
+				$member->dateAdded   = time();
+				$member->createdOn   = time();
+				$member->firstname   = $userData['first_name'];
+				$member->lastname    = $userData['last_name'];
+				$member->gender      = $userData['gender'];
+				$member->email       = strtolower($userData['email']);
+				$member->login       = 1;
+				$member->username    = $username;
+				$member->language    = $userData['locale'];
+				$member->facebook_id = $userData['id'];
+			}
+
+			$member->password                  = \Encryption::hash($params['access_token']);
+			$member->facebook_link             = $userData['link'];
+			$member->facebook_access_token     = $params['access_token'];
+			$member->facebook_access_token_ttl = time() + $params['expires'];
+
+			$event = new PostConnectEvent($params, $userData, $member, $newMember);
+			$eventDispatcher->dispatch(FacebookConnectEvents::POST_CONNECT, $event);
+
+			$event->getMember()->save();
+
+			unset($_SESSION['FACEBOOK_CONNECT_STATE']);
+			$_SESSION['FACEBOOK_CONNECT_LOGIN'] = array($member->username, $params['access_token']);
+
+			\Controller::redirect($redirectUrl);
 		}
-
-		$member->password                  = \Encryption::hash($params['access_token']);
-		$member->facebook_link             = $userData['link'];
-		$member->facebook_access_token     = $params['access_token'];
-		$member->facebook_access_token_ttl = time() + $params['expires'];
-
-		$event = new PostConnectEvent($params, $userData, $member, $newMember);
-		$eventDispatcher->dispatch(FacebookConnectEvents::POST_CONNECT, $event);
-
-		$member->save();
-
-		unset($_SESSION['FACEBOOK_CONNECT_STATE']);
-		$_SESSION['FACEBOOK_CONNECT_LOGIN'] = array($member->username, $params['access_token']);
-
-		\Controller::redirect($redirectUrl);
+		catch (BadResponseException $exception) {
+			$redirectUrl .= '?' . http_build_query(
+				array(
+					'status_code'    => $exception->getResponse()->getStatusCode(),
+					'status_message' => $exception->getResponse()->getReasonPhrase(),
+				)
+			);
+			\Controller::redirect($redirectUrl);
+		}
 	}
 
 	/**
