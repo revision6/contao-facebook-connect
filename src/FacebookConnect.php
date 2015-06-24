@@ -264,7 +264,7 @@ class FacebookConnect extends \TwigSimpleHybrid
 					throw new \RuntimeException('Page ID ' . $this->facebook_connect_jumpTo . ' was not found');
 				}
 
-				\Controller::redirect($page->row());
+				\Controller::redirect($this->generateFrontendUrl($page->row()));
 			}
 
 			// redirect to start page
