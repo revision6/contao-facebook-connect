@@ -149,7 +149,12 @@ class FacebookConnect extends \TwigSimpleHybrid
 			parse_str($response->getBody(true), $params);
 
 			// fetch user profile
-			$url = 'https://graph.facebook.com/me?' . http_build_query(array('access_token' => $params['access_token']));
+			$url = 'https://graph.facebook.com/me?' . http_build_query(
+					array(
+						'access_token' => $params['access_token'],
+						'fields'       => 'id,name,first_name,last_name,gender,email,locale,link'
+					)
+			);
 
 			$request  = $client->get($url);
 			$response = $request->send();
