@@ -293,12 +293,8 @@ class FacebookConnect extends \TwigSimpleHybrid
 		// Log activity
 		$this->log('User account ID ' . $objMember->id . ' (' . $objMember->email . ') has been activated', __METHOD__, TL_ACCESS);
 
-		// Remove token so that only one module listen to it.
-		\Input::setGet('token', '');
-
-		// Confirm activation
-		$this->Template->type = 'confirm';
-		$this->Template->message = $GLOBALS['TL_LANG']['MSC']['accountActivated'];
+		// Redirect to current page.
+		\Controller::redirect(\Controller::generateFrontendUrl($GLOBALS['objPage']->row()));
 	}
 
 	/**
