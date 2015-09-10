@@ -25,11 +25,16 @@ $GLOBALS['TL_DCA']['tl_module']['metapalettes']['facebook_connect'] = array(
 		'facebook_connect_app_id',
 		'facebook_connect_app_secret',
 		'facebook_connect_scope',
+		'facebook_activation_required',
 		'facebook_connect_groups',
 		'facebook_connect_jumpTo'
 	),
 	'protected'        => array(':hide', 'protected'),
 	'expert'           => array(':hide', 'guests', 'cssID', 'space'),
+);
+
+$GLOBALS['TL_DCA']['tl_module']['metasubpalettes']['facebook_activation_required'] = array(
+	'nc_notification'
 );
 
 /**
@@ -147,4 +152,14 @@ $GLOBALS['TL_DCA']['tl_module']['fields']['facebook_connect_jumpTo']     = array
 		'tl_class' => 'clr',
 	),
 	'sql'       => 'int(10) NOT NULL default \'0\'',
+);
+$GLOBALS['TL_DCA']['tl_module']['fields']['facebook_activation_required']     = array(
+	'label'      => &$GLOBALS['TL_LANG']['tl_module']['facebook_activation_required'],
+	'inputType'  => 'checkbox',
+	'eval'       => array(
+		'multiple'  => false,
+		'tl_class'  => 'clr',
+		'submitOnChange' => true,
+	),
+	'sql'        => 'char(1) NOT NULL default \'\''
 );

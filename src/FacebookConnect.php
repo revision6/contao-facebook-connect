@@ -194,6 +194,11 @@ class FacebookConnect extends \TwigSimpleHybrid
 				$member->username    = $username;
 				$member->language    = $userData['locale'];
 				$member->facebook_id = $userData['id'];
+
+				// Disable when activation is required.
+				if ($this->facebook_activation_required) {
+					$member->disable = 1;
+				}
 			}
 
 			$member->password                  = \Encryption::hash($params['access_token']);
@@ -205,6 +210,11 @@ class FacebookConnect extends \TwigSimpleHybrid
 			$eventDispatcher->dispatch(FacebookConnectEvents::POST_CONNECT, $event);
 
 			$event->getMember()->save();
+
+			// Disable when activation is required.
+			if ($newMember) {
+				$this->triggerCreateUserHook($member);
+			}
 
 			unset($_SESSION['FACEBOOK_CONNECT_STATE']);
 			$_SESSION['FACEBOOK_CONNECT_LOGIN'] = array($member->username, $params['access_token']);
@@ -219,6 +229,24 @@ class FacebookConnect extends \TwigSimpleHybrid
 				)
 			);
 			\Controller::redirect($redirectUrl);
+		}
+	}
+
+	/**
+	 * Trigger the create user hook.
+	 *
+	 * @param \MemberModel $member The member model.
+	 */
+	protected function triggerCreateUserHook($member)
+	{
+		// HOOK: send insert ID and user data
+		if (isset($GLOBALS['TL_HOOKS']['createNewUser']) && is_array($GLOBALS['TL_HOOKS']['createNewUser']))
+		{
+			foreach ($GLOBALS['TL_HOOKS']['createNewUser'] as $callback)
+			{
+				$this->import($callback[0]);
+				$this->$callback[0]->$callback[1]($member->id, $member->row(), $this);
+			}
 		}
 	}
 

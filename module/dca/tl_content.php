@@ -25,12 +25,17 @@ $GLOBALS['TL_DCA']['tl_content']['metapalettes']['facebook_connect'] = array(
 		'facebook_connect_app_id',
 		'facebook_connect_app_secret',
 		'facebook_connect_scope',
+		'facebook_activation_required',
 		'facebook_connect_groups',
 		'facebook_connect_jumpTo'
 	),
 	'protected'        => array(':hide', 'protected'),
 	'expert'           => array(':hide', 'guests', 'cssID', 'space'),
 	'invisible'        => array(':hide', 'invisible', 'start', 'stop'),
+);
+
+$GLOBALS['TL_DCA']['tl_content']['metasubpalettes']['facebook_activation_required'] = array(
+	'nc_notification'
 );
 
 /**
@@ -149,3 +154,16 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['facebook_connect_jumpTo']     = arra
 	),
 	'sql'       => 'int(10) NOT NULL default \'0\'',
 );
+
+if (in_array('notification_center', \ModuleLoader::getActive())) {
+	$GLOBALS['TL_DCA']['tl_content']['fields']['nc_notification'] = array
+	(
+		'label'                     => &$GLOBALS['TL_LANG']['tl_content']['nc_notification'],
+		'exclude'                   => true,
+		'inputType'                 => 'select',
+		'options_callback'          => array('NotificationCenter\tl_module', 'getNotificationChoices'),
+		'eval'                      => array('includeBlankOption'=>true, 'chosen'=>true, 'tl_class'=>'w50'),
+		'sql'                       => "int(10) unsigned NOT NULL default '0'",
+		'relation'                  => array('type'=>'hasOne', 'load'=>'lazy', 'table'=>'tl_nc_notification'),
+	);
+}

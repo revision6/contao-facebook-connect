@@ -40,6 +40,11 @@ $GLOBALS['TL_LANG']['tl_module']['facebook_connect_jumpTo']     = array(
 	'Please choose the page to which visitors will be redirected after successful log-in.'
 );
 
+$GLOBALS['TL_LANG']['tl_module']['facebook_activation_required']      = array(
+	'Send activation mail',
+	'User is disabled by default. He has to use the activation mail first.'
+);
+
 /**
  * Legends
  */
