@@ -294,7 +294,7 @@ class FacebookConnect extends \TwigSimpleHybrid
 		$this->log('User account ID ' . $objMember->id . ' (' . $objMember->email . ') has been activated', __METHOD__, TL_ACCESS);
 
 		// Redirect to the jumpTo page
-		if (($objTarget = $this->objModel->getRelated('reg_jumpTo')) !== null)
+		if (($objTarget = \PageModel::findByPk($this->facebook_connect_jumpTo)) !== null)
 		{
 			$this->redirect($this->generateFrontendUrl($objTarget->row()));
 		}
