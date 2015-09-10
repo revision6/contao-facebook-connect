@@ -154,6 +154,16 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['facebook_connect_jumpTo']     = arra
 	),
 	'sql'       => 'int(10) NOT NULL default \'0\'',
 );
+$GLOBALS['TL_DCA']['tl_content']['fields']['facebook_activation_required']     = array(
+	'label'      => &$GLOBALS['TL_LANG']['tl_content']['facebook_activation_required'],
+	'inputType'  => 'checkbox',
+	'eval'       => array(
+		'multiple'  => false,
+		'tl_class'  => 'clr',
+		'submitOnChange' => true,
+	),
+	'sql'        => 'char(1) NOT NULL default \'\''
+);
 
 if (in_array('notification_center', \ModuleLoader::getActive())) {
 	$GLOBALS['TL_DCA']['tl_content']['fields']['nc_notification'] = array
