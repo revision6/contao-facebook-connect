@@ -197,7 +197,8 @@ class FacebookConnect extends \TwigSimpleHybrid
 
 				// Disable when activation is required.
 				if ($this->facebook_activation_required) {
-					$member->disable = 1;
+					$member->activation = md5(uniqid(mt_rand(), true));
+					$member->disable    = 1;
 				}
 			}
 
