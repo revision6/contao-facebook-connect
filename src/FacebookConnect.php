@@ -293,11 +293,8 @@ class FacebookConnect extends \TwigSimpleHybrid
 		// Log activity
 		$this->log('User account ID ' . $objMember->id . ' (' . $objMember->email . ') has been activated', __METHOD__, TL_ACCESS);
 
-		// Redirect to the jumpTo page
-		if (($objTarget = \PageModel::findByPk($this->facebook_connect_jumpTo)) !== null)
-		{
-			$this->redirect($this->generateFrontendUrl($objTarget->row()));
-		}
+		// Remove token so that only one module listen to it.
+		\Input::setGet('token', '');
 
 		// Confirm activation
 		$this->Template->type = 'confirm';
