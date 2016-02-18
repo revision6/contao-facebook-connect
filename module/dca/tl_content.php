@@ -27,7 +27,8 @@ $GLOBALS['TL_DCA']['tl_content']['metapalettes']['facebook_connect'] = array(
 		'facebook_connect_scope',
 		'facebook_activation_required',
 		'facebook_connect_groups',
-		'facebook_connect_jumpTo'
+		'facebook_connect_jumpTo',
+		'facebook_connect_registration_jumpTo'
 	),
 	'protected'        => array(':hide', 'protected'),
 	'expert'           => array(':hide', 'guests', 'cssID', 'space'),
@@ -148,6 +149,14 @@ $GLOBALS['TL_DCA']['tl_content']['fields']['facebook_connect_groups']     = arra
 );
 $GLOBALS['TL_DCA']['tl_content']['fields']['facebook_connect_jumpTo']     = array(
 	'label'     => &$GLOBALS['TL_LANG']['tl_content']['facebook_connect_jumpTo'],
+	'inputType' => 'pageTree',
+	'eval'      => array(
+		'tl_class' => 'clr',
+	),
+	'sql'       => 'int(10) NOT NULL default \'0\'',
+);
+$GLOBALS['TL_DCA']['tl_content']['fields']['facebook_connect_registration_jumpTo']     = array(
+	'label'     => &$GLOBALS['TL_LANG']['tl_content']['facebook_connect_registration_jumpTo'],
 	'inputType' => 'pageTree',
 	'eval'      => array(
 		'tl_class' => 'clr',

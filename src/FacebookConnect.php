@@ -221,6 +221,12 @@ class FacebookConnect extends \TwigSimpleHybrid
 			// Disable when activation is required.
 			if ($newMember) {
 				$this->triggerCreateUserHook($member);
+
+				$registrationInfoPage = \PageModel::findByPk($this->facebook_connect_registration_jumpTo);
+
+				if ($registrationInfoPage) {
+					\Controller::redirect(\Controller::generateFrontendUrl($registrationInfoPage->row()));
+				}
 			}
 
 			unset($_SESSION['FACEBOOK_CONNECT_STATE']);
